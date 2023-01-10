@@ -1,6 +1,7 @@
-import { connectDB } from '../../utils/db';
+import db from '../../utils/db';
 
 export default function handler(req, res) {
-  connectDB();
+  db.connectDB();
+  db.disconnectDB();
   res.status(200).json({ name: 'John Doe' });
 }
