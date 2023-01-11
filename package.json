@@ -1,5 +1,5 @@
 {
-  "name": "next-ecomerce",
+  "name": "next-e-commerce",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -19,6 +19,7 @@
     "next-redux-wrapper": "^8.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-icons": "^4.7.1",
     "react-redux": "^8.0.5",
     "redux": "^4.2.0",
     "redux-devtools-extension": "^2.13.9",

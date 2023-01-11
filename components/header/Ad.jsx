@@ -1,3 +1,5 @@
+import styles from './styles.module.scss';
+
 export default function Ad() {
-  return <div>advertisment</div>;
+  return <div className={styles.ad}>advertisment</div>;
 }
