@@ -2,6 +2,7 @@ import { MdSecurity } from 'react-icons/md';
 import { BsSuitHeart } from 'react-icons/bs';
 import { RiAccountPinCircleLine, RiArrowDropDownFill } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
+import SighInSighOut from '../login-btn';
 import styles from './styles.module.scss';
 
 export default function Top() {
@@ -34,6 +35,9 @@ export default function Top() {
           </li>
           <li>
             <span>Cart</span> <span>{cart.length}</span>
+          </li>
+          <li>
+            <SighInSighOut />
           </li>
         </ul>
       </div>

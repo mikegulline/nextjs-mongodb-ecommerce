@@ -3,7 +3,7 @@
 export default function Home() {
   return (
     <>
-      <h1>next home clone</h1>
+      <h1>next home</h1>
     </>
   );
 }
