@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      default: '',
+      default: 'https://avatars.githubusercontent.com/u/2972511',
     },
     emailVerified: {
       type: Boolean,
