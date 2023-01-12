@@ -7,11 +7,22 @@ import { getProviders, signIn } from 'next-auth/react';
 const initialValues = {
   login_email: '',
   login_password: '',
+  name: '',
+  email: '',
+  password: '',
+  confirm_password: '',
 };
 
 export default function SignIn({ providers }) {
   const [user, setUser] = useState(initialValues);
-  const { login_email, login_password } = user;
+  const {
+    login_email,
+    login_password,
+    name,
+    email,
+    password,
+    confirm_password,
+  } = user;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,50 +35,130 @@ export default function SignIn({ providers }) {
       .email('Please enter a valid email.'),
     login_password: Yup.string().required('Please enter a strong password'),
   });
+  const signUpValidation = Yup.object({
+    name: Yup.string()
+      .matches(/^[aA-zZ]+$/, 'Numbers and special characters are not allowed.')
+      .required('Please enter your name.')
+      .min(3, 'Name must be between 3 and 16 characters.')
+      .max(16, 'Name must be between 3 and 16 characters.'),
+    email: Yup.string()
+      .required('Email address is required.')
+      .email('Please enter a valid email.'),
+    password: Yup.string()
+      .required('Please enter a strong password')
+      .min(8, 'Password must be at least 8 characters.')
+      .max(36, 'Password can not be more than 36 characters.')
+      .matches(
+        /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/,
+        'Password must contain at least 8 characters, one uppercase, one number and one special case character.'
+      ),
+    confirm_password: Yup.string()
+      .required('Please enter a strong password')
+      .oneOf([Yup.ref('password')], 'Passwords do not match.'),
+  });
 
   return (
     <>
-      <h1>Sign In</h1>
-      <Formik
-        enableReinitialize
-        initialValues={{
-          login_email,
-          login_password,
-        }}
-        validationSchema={loginValidation}
-      >
-        {(form) => (
-          <Form>
-            <Input
-              type='text'
-              name='login_email'
-              icon='email'
-              placeholder='Email Address'
-              onChange={handleChange}
-              value={login_email}
-            />
-            <Input
-              type='password'
-              name='login_password'
-              icon='password'
-              placeholder='Password'
-              onChange={handleChange}
-              value={login_password}
-            />
-          </Form>
-        )}
-      </Formik>
-      <br />
-      <div>Or sign in with…</div>
-      {providers.map(({ name, id }) => {
-        if (name === 'Credentials') return;
+      <div>
+        <h1>Sign In</h1>
+        <Formik
+          enableReinitialize
+          initialValues={{
+            login_email,
+            login_password,
+          }}
+          validationSchema={loginValidation}
+        >
+          {(form) => (
+            <Form>
+              <Input
+                type='text'
+                name='login_email'
+                icon='email'
+                placeholder='Email Address'
+                onChange={handleChange}
+                value={login_email}
+              />
+              <Input
+                type='password'
+                name='login_password'
+                icon='password'
+                placeholder='Password'
+                onChange={handleChange}
+                value={login_password}
+              />
+              <button type='submit'>Sign In</button>
+            </Form>
+          )}
+        </Formik>
+        <br />
+        <div>Or sign in with…</div>
+        {providers.map(({ name, id }) => {
+          if (name === 'Credentials') return;
 
-        return (
-          <span key={id}>
-            <button onClick={() => signIn(id)}>{name}</button>{' '}
-          </span>
-        );
-      })}
+          return (
+            <span key={id}>
+              <button onClick={() => signIn(id)}>{name}</button>{' '}
+            </span>
+          );
+        })}
+      </div>
+
+      <br />
+      <hr />
+      <br />
+
+      <div>
+        <h1>Sign Up</h1>
+        <Formik
+          enableReinitialize
+          initialValues={{
+            name,
+            email,
+            password,
+            confirm_password,
+          }}
+          validationSchema={signUpValidation}
+        >
+          {(form) => (
+            <Form>
+              <Input
+                type='text'
+                name='name'
+                icon='user'
+                placeholder='Name'
+                onChange={handleChange}
+                value={name}
+              />
+              <Input
+                type='text'
+                name='email'
+                icon='email'
+                placeholder='Email Address'
+                onChange={handleChange}
+                value={email}
+              />
+              <Input
+                type='password'
+                name='password'
+                icon='password'
+                placeholder='Password'
+                onChange={handleChange}
+                value={password}
+              />
+              <Input
+                type='password'
+                name='confirm_password'
+                icon='password'
+                placeholder='Confirm Password'
+                onChange={handleChange}
+                value={confirm_password}
+              />
+              <button type='submit'>Sign Up</button>
+            </Form>
+          )}
+        </Formik>
+      </div>
     </>
   );
 }
