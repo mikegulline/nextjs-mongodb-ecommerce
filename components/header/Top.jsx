@@ -2,7 +2,7 @@ import { MdSecurity } from 'react-icons/md';
 import { BsSuitHeart } from 'react-icons/bs';
 import { RiAccountPinCircleLine, RiArrowDropDownFill } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import SighInSighOut from '../login-btn';
+import SighInSighOut from '../inputs/login-btn';
 import styles from './styles.module.scss';
 
 export default function Top() {
