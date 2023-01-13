@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import db from '../../../utils/db';
 import { validateEmail } from '../../../utils/validation';
 import User from '../../../models/User';
+import { createActivationToken } from '../../../utils/tokens';
+import { sendEmail } from '../../../utils/sendEmail';
 const handler = nc();
 
 handler.post(async (req, res) => {
@@ -37,7 +39,18 @@ handler.post(async (req, res) => {
     const newUser = new User({ name, email, password: encryptedPassword });
     const addedUser = await newUser.save();
 
-    res.status(200).json(addedUser);
+    const activation_token = createActivationToken({
+      id: addedUser._id.toString(),
+    });
+
+    const url = `${process.env.BASE_URL}activate/${activation_token}`;
+
+    sendEmail(email, url, 'Activate your account.');
+
+    await db.disconnectDB();
+    res.json({
+      message: 'Register success! Please activate your email to start.',
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
