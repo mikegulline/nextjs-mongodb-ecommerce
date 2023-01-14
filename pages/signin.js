@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Input from '../components/inputs/Input';
 import { getProviders, signIn } from 'next-auth/react';
 import axios from 'axios';
+import { useRouter } from 'next/router';
 
 const initialValues = {
   login_email: '',
@@ -17,6 +18,7 @@ const initialValues = {
 };
 
 export default function SignIn({ providers }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(initialValues);
   const {
@@ -73,6 +75,9 @@ export default function SignIn({ providers }) {
       });
       setUser({ ...user, error: '', success: data.message });
       setLoading(false);
+      setTimeout(() => {
+        router.push('/');
+      }, 2000);
     } catch (error) {
       setUser({ ...user, success: '', error: error.response.data.message });
       setLoading(false);
