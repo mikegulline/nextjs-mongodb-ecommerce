@@ -3,6 +3,7 @@ import * as Yup from 'yup';
 import { useState } from 'react';
 import Input from '../components/inputs/Input';
 import { getProviders, signIn } from 'next-auth/react';
+import axios from 'axios';
 
 const initialValues = {
   login_email: '',
@@ -11,9 +12,12 @@ const initialValues = {
   email: '',
   password: '',
   confirm_password: '',
+  success: '',
+  error: '',
 };
 
 export default function SignIn({ providers }) {
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(initialValues);
   const {
     login_email,
@@ -22,6 +26,8 @@ export default function SignIn({ providers }) {
     email,
     password,
     confirm_password,
+    success,
+    error,
   } = user;
 
   const handleChange = (e) => {
@@ -56,6 +62,22 @@ export default function SignIn({ providers }) {
       .required('Please enter a strong password')
       .oneOf([Yup.ref('password')], 'Passwords do not match.'),
   });
+
+  const signUpHandler = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.post('/api/auth/signup', {
+        name,
+        email,
+        password,
+      });
+      setUser({ ...user, error: '', success: data.message });
+      setLoading(false);
+    } catch (error) {
+      setUser({ ...user, success: '', error: error.response.data.message });
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -119,6 +141,9 @@ export default function SignIn({ providers }) {
             confirm_password,
           }}
           validationSchema={signUpValidation}
+          onSubmit={() => {
+            signUpHandler();
+          }}
         >
           {(form) => (
             <Form>
@@ -158,6 +183,8 @@ export default function SignIn({ providers }) {
             </Form>
           )}
         </Formik>
+        {error && <div>{error}</div>}
+        {success && <div>{success}</div>}
       </div>
     </>
   );
