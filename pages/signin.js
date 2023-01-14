@@ -15,6 +15,7 @@ const initialValues = {
   confirm_password: '',
   success: '',
   error: '',
+  login_error: '',
 };
 
 export default function SignIn({ providers }) {
@@ -30,6 +31,7 @@ export default function SignIn({ providers }) {
     confirm_password,
     success,
     error,
+    login_error,
   } = user;
 
   const handleChange = (e) => {
@@ -75,12 +77,36 @@ export default function SignIn({ providers }) {
       });
       setUser({ ...user, error: '', success: data.message });
       setLoading(false);
-      setTimeout(() => {
+      setTimeout(async () => {
+        let options = {
+          redirect: false,
+          email,
+          password,
+        };
+        const res = await signIn('credentials', options);
         router.push('/');
       }, 2000);
     } catch (error) {
       setUser({ ...user, success: '', error: error.response.data.message });
       setLoading(false);
+    }
+  };
+
+  const signInHandler = async () => {
+    setLoading(true);
+    let options = {
+      redirect: false,
+      email: login_email,
+      password: login_password,
+    };
+    const res = await signIn('credentials', options);
+    setUser({ ...user, success: '', error: '' });
+    setLoading(false);
+    if (res?.error) {
+      setLoading(false);
+      setUser({ ...user, login_error: res?.error });
+    } else {
+      return router.push('/');
     }
   };
 
@@ -95,6 +121,9 @@ export default function SignIn({ providers }) {
             login_password,
           }}
           validationSchema={loginValidation}
+          onSubmit={() => {
+            signInHandler();
+          }}
         >
           {(form) => (
             <Form>
@@ -118,6 +147,7 @@ export default function SignIn({ providers }) {
             </Form>
           )}
         </Formik>
+        {login_error && <div>{login_error}</div>}
         <br />
         <div>Or sign in with…</div>
         {providers.map(({ name, id }) => {
