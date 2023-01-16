@@ -45,6 +45,14 @@ export const authOptions = {
       issuer: process.env.AUTH0_ISSUER,
     }),
   ],
+  callbacks: {
+    async session({ session, token }) {
+      let user = await User.findById(token.sub);
+      session.user._id = token.sub || user._id.toString();
+      session.user.role = user.role || 'user';
+      return session;
+    },
+  },
   pages: {
     signIn: '/signin',
   },
