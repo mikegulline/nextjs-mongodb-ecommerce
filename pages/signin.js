@@ -2,7 +2,13 @@ import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { useState } from 'react';
 import Input from '../components/inputs/Input';
-import { getProviders, signIn } from 'next-auth/react';
+import Link from 'next/link';
+import {
+  getCsrfToken,
+  getProviders,
+  getSession,
+  signIn,
+} from 'next-auth/react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 
@@ -18,7 +24,7 @@ const initialValues = {
   login_error: '',
 };
 
-export default function SignIn({ providers }) {
+export default function SignIn({ providers, csrfToken, callbackUrl }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(initialValues);
@@ -84,7 +90,7 @@ export default function SignIn({ providers }) {
           password,
         };
         const res = await signIn('credentials', options);
-        router.push('/');
+        router.push(callbackUrl || '/');
       }, 2000);
     } catch (error) {
       setUser({ ...user, success: '', error: error.response.data.message });
@@ -106,7 +112,7 @@ export default function SignIn({ providers }) {
       setLoading(false);
       setUser({ ...user, login_error: res?.error });
     } else {
-      return router.push('/');
+      return router.push(callbackUrl || '/');
     }
   };
 
@@ -126,7 +132,8 @@ export default function SignIn({ providers }) {
           }}
         >
           {(form) => (
-            <Form>
+            <Form method='post' action='/api/auth/signin/email'>
+              <input type='hidden' name='csrfToken' defaultValue={csrfToken} />
               <Input
                 type='text'
                 name='login_email'
@@ -143,6 +150,9 @@ export default function SignIn({ providers }) {
                 onChange={handleChange}
                 value={login_password}
               />
+              <p>
+                <Link href='/auth/forgot'>Forgot password</Link>
+              </p>
               <button type='submit'>Sign In</button>
             </Form>
           )}
@@ -166,6 +176,7 @@ export default function SignIn({ providers }) {
       <br />
 
       <div>
+        {loading && <div>Loading…</div>}
         <h1>Sign Up</h1>
         <Formik
           enableReinitialize
@@ -226,9 +237,20 @@ export default function SignIn({ providers }) {
 }
 
 export async function getServerSideProps(context) {
+  const { req, query } = context;
+  const session = await getSession({ req });
+  const { callbackUrl } = query;
+  if (session) {
+    return {
+      redirect: {
+        destination: callbackUrl,
+      },
+    };
+  }
+  const csrfToken = await getCsrfToken(context);
   const providers = Object.values(await getProviders());
 
   return {
-    props: { providers },
+    props: { providers, csrfToken, callbackUrl },
   };
 }

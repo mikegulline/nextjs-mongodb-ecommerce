@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 import { validateEmail } from '../../../utils/validation';
 import { createActivationToken } from '../../../utils/tokens';
 import { sendEmail } from '../../../utils/sendEmail';
+import { activateEmailTemplate } from '../../../emails/activateEmailTemplate';
 
 const handler = nc();
 
@@ -46,7 +47,7 @@ handler.post(async (req, res) => {
 
     const url = `${process.env.BASE_URL}activate/${activation_token}`;
 
-    // sendEmail(email, url, 'Activate your account.');
+    // sendEmail(email, url, 'Activate your account.', activateEmailTemplate);
 
     await db.disconnectDB();
 
