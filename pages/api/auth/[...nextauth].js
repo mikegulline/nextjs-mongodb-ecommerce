@@ -50,6 +50,7 @@ export const authOptions = {
       let user = await User.findById(token.sub);
       session.user._id = token.sub || user._id.toString();
       session.user.role = user.role || 'user';
+      session.user.emailVerified = user.emailVerified;
       return session;
     },
   },
