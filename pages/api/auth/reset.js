@@ -18,18 +18,17 @@ handler.put(async (req, res) => {
 
   const encryptedPassword = await bcrypt.hash(password, 12);
 
-  const updatedUser = await User.findByIdAndUpdate(ObjectId(id), {
+  await updateUser.updateOne({
     password: encryptedPassword,
   });
-
-  if (!updatedUser) {
-    return res.status(400).json({ message: 'Unable to update user.' });
-  }
 
   db.disconnectDB();
   return res
     .status(200)
-    .json({ message: 'Password updated successfuly.', updatedUser });
+    .json({
+      message: 'Password updated successfuly.',
+      email: updateUser.email,
+    });
 });
 
 export default handler;
